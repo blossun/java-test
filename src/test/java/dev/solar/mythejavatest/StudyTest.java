@@ -1,44 +1,36 @@
 package dev.solar.mythejavatest;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
-import static org.junit.jupiter.api.Assumptions.assumingThat;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class StudyTest {
     @Test
     @DisplayName("스터디 만들기 ╯°□°）╯ ")
+    @EnabledOnOs({OS.MAC, OS.LINUX}) //해당 운영체제애서만 활성화
+    @EnabledOnJre({JRE.JAVA_8, JRE.JAVA_9, JRE.JAVA_10, JRE.JAVA_11}) //해당 Java 버전환경에서만 활성화
+    @EnabledIfEnvironmentVariable(named = "TEST_ENV", matches = "SOLAR")
     void create_new_study() {
         String test_env = System.getenv("TEST_ENV");
         System.out.println("TEST_ENV : " + test_env);
 
-        assumingThat("LOCAL".equalsIgnoreCase(test_env), () -> {
-            System.out.println(">> local test");
-            //조건이 맞는 경우 아래 코드 실행
-            Study actual = new Study(100);
-            assertThat(actual.getLimit()).isGreaterThan(0);
-
-        });
-
-        assumingThat("SOLAR".equalsIgnoreCase(test_env), () -> {
-            System.out.println(">> solar test");
-            //조건이 맞는 경우 아래 코드 실행
-            Study actual = new Study(10);
-            assertThat(actual.getLimit()).isGreaterThan(0);
-        });
+        Study actual = new Study(10);
+        assertThat(actual.getLimit()).isGreaterThan(0);
     }
 
     @Test
     @DisplayName("스터디 만들기 \uD83D\uDE31")
+    @EnabledOnJre(JRE.OTHER) //JRE.OTHER : 상수로 지정된 값이 아닌 경우
+    @EnabledIfEnvironmentVariable(named = "TEST_ENV", matches = "LOCAL")
     void create_new_study_again() {
         Study actual = new Study(10);
         assertThat(actual.getLimit()).isGreaterThan(0);
     }
 
     @Test
-    @Disabled
+    @DisabledOnOs(OS.MAC) //해당 운영체제에서 비활성화
     void create2() {
         System.out.println("create2");
     }
