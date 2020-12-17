@@ -11,10 +11,11 @@ class StudyTest {
     @Test
     @DisplayName("스터디 만들기 ╯°□°）╯ ")
     void create_new_study() {
-        assertTimeout(Duration.ofMillis(100), () -> {
+        assertTimeoutPreemptively(Duration.ofMillis(100), () -> {
             new Study(10);
             Thread.sleep(300); // 일부러 실패하도록 실행을 일정시간 멈춤
         }); //10초 안에 실행이 끝나는지 확인
+        // TODO ThreadLocal
     }
 
     @Test
