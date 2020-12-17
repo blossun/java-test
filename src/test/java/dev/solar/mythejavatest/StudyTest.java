@@ -9,7 +9,10 @@ class StudyTest {
     @Test
     @DisplayName("스터디 만들기 ╯°□°）╯ ")
     void create_new_study() {
-        assertThrows(IllegalArgumentException.class, () -> new Study(-10));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Study(-10));
+        String exceptionMessage = exception.getMessage();
+        String expectedMessage = "limit은 0보다 커야 한다.";
+        assertEquals(expectedMessage, exceptionMessage);
     }
 
     @Test
