@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumingThat;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class StudyTest {
@@ -12,11 +13,21 @@ class StudyTest {
     void create_new_study() {
         String test_env = System.getenv("TEST_ENV");
         System.out.println("TEST_ENV : " + test_env);
-        assumeTrue("LOCAL".equalsIgnoreCase(test_env));
 
-        //assumeTrue를 통과하는 경우에만 아래 코드를 실행
-        Study actual = new Study(10);
-        assertThat(actual.getLimit()).isGreaterThan(0);
+        assumingThat("LOCAL".equalsIgnoreCase(test_env), () -> {
+            System.out.println(">> local test");
+            //조건이 맞는 경우 아래 코드 실행
+            Study actual = new Study(100);
+            assertThat(actual.getLimit()).isGreaterThan(0);
+
+        });
+
+        assumingThat("SOLAR".equalsIgnoreCase(test_env), () -> {
+            System.out.println(">> solar test");
+            //조건이 맞는 경우 아래 코드 실행
+            Study actual = new Study(10);
+            assertThat(actual.getLimit()).isGreaterThan(0);
+        });
     }
 
     @Test
