@@ -11,18 +11,10 @@ class StudyTest {
     @Test
     @DisplayName("스터디 만들기 ╯°□°）╯ ")
     void create_new_study() {
-        System.out.println("create");
-        Study study = new Study();
+        Study study = new Study(-10);
         assertNotNull(study);
-        // 매번 문자열 연산 수행
-        assertEquals(StudyStatus.DRAFT, study.getStatus(), "스터디를 처음 만들면 상태값이 " + StudyStatus.DRAFT + "여야 한다.");
-        // 람다식으로 넘기면 테스트에 실패한 경우에만 실행 (문자열 연산 비용을 줄일 수 있다.)
-        assertEquals(StudyStatus.DRAFT, study.getStatus(), new Supplier<String>() {
-            @Override
-            public String get() {
-                return "스터디를 처음 만들면 상태값이 " + StudyStatus.DRAFT + "여야 한다.";
-            }
-        });
+        assertEquals(StudyStatus.DRAFT, study.getStatus(), () -> "스터디를 처음 만들면 상태값이 " + StudyStatus.DRAFT + "여야 한다.");
+        assertTrue(study.getLimit() > 0, "스터디 최대 참석 가능 인원은 0보다 커야 한다.");
     }
 
     @Test
