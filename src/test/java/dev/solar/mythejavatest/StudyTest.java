@@ -2,6 +2,8 @@ package dev.solar.mythejavatest;
 
 import org.junit.jupiter.api.*;
 
+import java.time.Duration;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -9,10 +11,10 @@ class StudyTest {
     @Test
     @DisplayName("스터디 만들기 ╯°□°）╯ ")
     void create_new_study() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Study(-10));
-        String exceptionMessage = exception.getMessage();
-        String expectedMessage = "limit은 0보다 커야 한다.";
-        assertEquals(expectedMessage, exceptionMessage);
+        assertTimeout(Duration.ofMillis(100), () -> {
+            new Study(10);
+            Thread.sleep(300); // 일부러 실패하도록 실행을 일정시간 멈춤
+        }); //10초 안에 실행이 끝나는지 확인
     }
 
     @Test
