@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 
 import java.time.Duration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -21,7 +22,8 @@ class StudyTest {
     @Test
     @DisplayName("스터디 만들기 \uD83D\uDE31")
     void create_new_study_again() {
-        System.out.println("create1");
+        Study actual = new Study(10);
+        assertThat(actual.getLimit()).isGreaterThan(0);
     }
 
     @Test
