@@ -2,21 +2,21 @@ package dev.solar.mythejavatest;
 
 import org.junit.jupiter.api.*;
 
-import java.time.Duration;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class StudyTest {
     @Test
     @DisplayName("스터디 만들기 ╯°□°）╯ ")
     void create_new_study() {
-        assertTimeoutPreemptively(Duration.ofMillis(100), () -> {
-            new Study(10);
-            Thread.sleep(300); // 일부러 실패하도록 실행을 일정시간 멈춤
-        }); //10초 안에 실행이 끝나는지 확인
-        // TODO ThreadLocal
+        String test_env = System.getenv("TEST_ENV");
+        System.out.println("TEST_ENV : " + test_env);
+        assumeTrue("LOCAL".equalsIgnoreCase(test_env));
+
+        //assumeTrue를 통과하는 경우에만 아래 코드를 실행
+        Study actual = new Study(10);
+        assertThat(actual.getLimit()).isGreaterThan(0);
     }
 
     @Test
