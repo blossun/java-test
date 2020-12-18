@@ -1,8 +1,12 @@
 package dev.solar.mythejavatest;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.AggregateWith;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregationException;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregator;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -48,12 +52,18 @@ class StudyTest {
     @DisplayName("반복 테스트 3 - 인자값 조합")
     @ParameterizedTest(name = "{index} {displayName} message={0}")
     @CsvSource({"10, 자바 스터디", "20, '스프링'"})
-    void parameterizedTest(ArgumentsAccessor argumentsAccessor) {
-        Study study = new Study(argumentsAccessor.getInteger(0), argumentsAccessor.getString(1));
+    void parameterizedTest(@AggregateWith(StudyAggregator.class) Study study) {
         System.out.println(study);
     }
 
-    public static class StudyConverter extends SimpleArgumentConverter {
+    static class StudyAggregator implements ArgumentsAggregator {
+        @Override
+        public Object aggregateArguments(ArgumentsAccessor argumentsAccessor, ParameterContext parameterContext) throws ArgumentsAggregationException {
+            return new Study(argumentsAccessor.getInteger(0), argumentsAccessor.getString(1));
+        }
+    }
+
+    static class StudyConverter extends SimpleArgumentConverter {
         @Override
         protected Object convert(Object source, Class<?> targetType) throws ArgumentConversionException {
             assertEquals(Study.class, targetType, "Can only convert to Study");
