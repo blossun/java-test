@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
@@ -46,9 +47,10 @@ class StudyTest {
 
     @DisplayName("반복 테스트 3 - 명시적 변환")
     @ParameterizedTest(name = "{index} {displayName} message={0}")
-    @ValueSource(ints = {10, 20, 40})
-    void parameterizedTest(@ConvertWith(StudyConverter.class) Study study) {
-        System.out.println(study.getLimit());
+    @CsvSource({"10, 자바 스터디", "20, '스프링'"})
+    void parameterizedTest(Integer limit, String name) {
+        Study study = new Study(limit, name);
+        System.out.println(study);
     }
 
     public static class StudyConverter extends SimpleArgumentConverter {
