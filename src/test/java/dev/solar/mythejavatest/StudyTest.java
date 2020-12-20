@@ -20,9 +20,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class StudyTest {
+
+    int value = 1;
+
     @FastTest
     @DisplayName("스터디 만들기 fast")
     void create_new_study() {
+        System.out.println(this);
+        System.out.println(value++);
         Study actual = new Study(10);
         assertThat(actual.getLimit()).isGreaterThan(0);
     }
@@ -30,6 +35,8 @@ class StudyTest {
     @SlowTest
     @DisplayName("스터디 만들기 slow")
     void create_new_study_again() {
+        System.out.println(this);
+        System.out.println(value++);
         Study actual = new Study(10);
         assertThat(actual.getLimit()).isGreaterThan(0);
     }
