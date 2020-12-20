@@ -19,11 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class StudyTest {
 
     int value = 1;
 
+    @Order(2)
     @FastTest
     @DisplayName("스터디 만들기 fast")
     void create_new_study() {
@@ -33,6 +34,7 @@ class StudyTest {
         assertThat(actual.getLimit()).isGreaterThan(0);
     }
 
+    @Order(1)
     @SlowTest
     @DisplayName("스터디 만들기 slow")
     void create_new_study_again() {
@@ -42,6 +44,7 @@ class StudyTest {
         assertThat(actual.getLimit()).isGreaterThan(0);
     }
 
+    @Order(5)
     @DisplayName("반복 테스트")
     @RepeatedTest(value = 10, name = "{displayName}, {currentRepetition}/{totalRepetitions}")
     void repeatTest(RepetitionInfo repetitionInfo) {
@@ -49,6 +52,7 @@ class StudyTest {
                 repetitionInfo.getTotalRepetitions());
     }
 
+    @Order(3)
     @DisplayName("반복 테스트 2 - 암시적 변환")
     @ParameterizedTest
     @ValueSource(strings = {"2017-03-14", "2020-01-20"})
@@ -57,6 +61,7 @@ class StudyTest {
         assertTrue(localDate != null);
     }
 
+    @Order(4)
     @DisplayName("반복 테스트 3 - 인자값 조합")
     @ParameterizedTest(name = "{index} {displayName} message={0}")
     @CsvSource({"10, 자바 스터디", "20, '스프링'"})
@@ -80,12 +85,12 @@ class StudyTest {
     }
 
     @BeforeAll
-    void beforeAll() {
+    static void beforeAll() {
         System.out.println("before all");
     }
 
     @AfterAll
-    void afterAll() {
+    static void afterAll() {
         System.out.println("after all");
     }
 
