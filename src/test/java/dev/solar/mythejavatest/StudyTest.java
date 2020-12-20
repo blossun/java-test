@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StudyTest {
 
     int value = 1;
@@ -79,12 +80,12 @@ class StudyTest {
     }
 
     @BeforeAll
-    static void beforeAll() {
+    void beforeAll() {
         System.out.println("before all");
     }
 
     @AfterAll
-    static void afterAll() {
+    void afterAll() {
         System.out.println("after all");
     }
 
