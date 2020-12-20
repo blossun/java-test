@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class StudyTest {
 
@@ -27,6 +26,7 @@ class StudyTest {
     @Order(2)
     @FastTest
     @DisplayName("스터디 만들기 fast")
+    @Disabled
     void create_new_study() {
         System.out.println(this);
         System.out.println(value++);
