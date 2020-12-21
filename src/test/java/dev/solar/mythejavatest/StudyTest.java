@@ -1,5 +1,7 @@
 package dev.solar.mythejavatest;
 
+import dev.solar.mythejavatest.domain.Study;
+import dev.solar.mythejavatest.study.StudyStatus;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -16,8 +18,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class StudyTest {
@@ -33,10 +34,12 @@ class StudyTest {
     @DisplayName("스터디 만들기 fast")
     @Disabled
     void create_new_study() {
-        System.out.println(this);
-        System.out.println(value++);
-        Study actual = new Study(10);
-        assertThat(actual.getLimit()).isGreaterThan(0);
+        Study actual = new Study(1, "테스트 스터디");
+        assertAll(
+                () -> assertEquals(1, actual.getLimitCount()),
+                () -> assertEquals("테스트 스터디", actual.getName()),
+                () -> assertEquals(StudyStatus.DRAFT, actual.getStatus())
+        );
     }
 
     @Order(1)
@@ -46,8 +49,6 @@ class StudyTest {
         Thread.sleep(1005L);
         System.out.println(this);
         System.out.println(value++);
-        Study actual = new Study(10);
-        assertThat(actual.getLimit()).isGreaterThan(0);
     }
 
     @Order(1)
