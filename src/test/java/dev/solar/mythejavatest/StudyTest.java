@@ -1,6 +1,7 @@
 package dev.solar.mythejavatest;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.AggregateWith;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(FindSlowTestExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class StudyTest {
 
@@ -37,11 +39,20 @@ class StudyTest {
     @Order(1)
     @SlowTest
     @DisplayName("스터디 만들기 slow")
-    void create_new_study_again() {
+    void create_new_study_again() throws InterruptedException {
+        Thread.sleep(1005L);
         System.out.println(this);
         System.out.println(value++);
         Study actual = new Study(10);
         assertThat(actual.getLimit()).isGreaterThan(0);
+    }
+
+    @Order(1)
+    @Test
+    @DisplayName("스터디 만들기 slow ?")
+    void create_slow_study() throws InterruptedException {
+        Thread.sleep(1005L);
+        System.out.println("is slow?? ");
     }
 
     @Order(5)
