@@ -37,14 +37,9 @@ class StudyServiceTest {
         studyService.createNewStudy(1L, study);
         assertEquals(member, study.getOwner());
 
-        // 호출 횟수 검증
+        // 특정 시점 이후에 아무 일도 벌어지지 않았는지 검증
         verify(memberService, times(1)).notify(study);
-        verify(memberService, never()).validate(any()); //어떠한 매개변수로도 validate()가 호출되지 않았는지
-
-        // 호출 순서 검증
-        InOrder inOrder = inOrder(memberService);
-        inOrder.verify(memberService).notify(study);
-        inOrder.verify(memberService).notify(member);
+        verifyNoMoreInteractions(memberService); //memberService에서 notify(study)이후 notify(member)하고 있으므로 깨지는 테스트이다.
     }
 
 }
