@@ -6,10 +6,7 @@ import dev.solar.mythejavatest.member.MemberService;
 import dev.solar.mythejavatest.study.StudyRepository;
 import dev.solar.mythejavatest.study.StudyService;
 import dev.solar.mythejavatest.study.StudyStatus;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
 
@@ -28,6 +27,7 @@ import static org.mockito.Mockito.times;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
+@Testcontainers
 class StudyServiceTest {
     @Mock
     MemberService memberService;
@@ -35,18 +35,13 @@ class StudyServiceTest {
     @Autowired
     StudyRepository studyRepository;
 
+    @Container
     static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer()
             .withDatabaseName("studytest");
 
-    @BeforeAll
-    static void beforeAll() {
-        postgreSQLContainer.start(); //컨테이서 시작
-        System.out.println(postgreSQLContainer.getJdbcUrl()); //어떤 위치에 postgreSQL이 떴는지 확인
-    }
-
-    @AfterAll
-    static void afterAll() {
-        postgreSQLContainer.stop(); //컨테이너 종료
+    @BeforeEach
+    void beforeEach() {
+        studyRepository.deleteAll();
     }
 
     @Test
