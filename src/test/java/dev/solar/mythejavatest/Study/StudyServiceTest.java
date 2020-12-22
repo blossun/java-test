@@ -1,6 +1,7 @@
 package dev.solar.mythejavatest.Study;
 
 import dev.solar.mythejavatest.domain.Member;
+import dev.solar.mythejavatest.domain.Study;
 import dev.solar.mythejavatest.member.MemberService;
 import dev.solar.mythejavatest.study.StudyRepository;
 import dev.solar.mythejavatest.study.StudyService;
@@ -43,6 +44,25 @@ class StudyServiceTest {
 
         assertEquals(Optional.empty(), memberService.findById(3L));
 
+    }
+
+    @Test
+    void practiceTest(@Mock MemberService memberService, @Mock StudyRepository repository) {
+        StudyService studyService = new StudyService(memberService, repository);
+
+        Member member = new Member();
+        member.setId(1L);
+        member.setEmail("solar@test.com");
+
+        Study study = new Study(10, "테스트");
+
+        when(memberService.findById(1L)).thenReturn(Optional.of(member));
+
+        when(repository.save(study)).thenReturn(study);
+
+        studyService.createNewStudy(1L, study);
+
+        assertEquals(member, study.getOwner());
     }
 
 }
