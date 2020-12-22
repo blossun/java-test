@@ -6,30 +6,48 @@ import dev.solar.mythejavatest.member.MemberService;
 import dev.solar.mythejavatest.study.StudyRepository;
 import dev.solar.mythejavatest.study.StudyService;
 import dev.solar.mythejavatest.study.StudyStatus;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.verification.VerificationMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 class StudyServiceTest {
-    @Mock MemberService memberService;
+    @Mock
+    MemberService memberService;
 
-    @Autowired StudyRepository studyRepository;
+    @Autowired
+    StudyRepository studyRepository;
+
+    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer()
+            .withDatabaseName("studytest");
+
+    @BeforeAll
+    static void beforeAll() {
+        postgreSQLContainer.start(); //컨테이서 시작
+        System.out.println(postgreSQLContainer.getJdbcUrl()); //어떤 위치에 postgreSQL이 떴는지 확인
+    }
+
+    @AfterAll
+    static void afterAll() {
+        postgreSQLContainer.stop(); //컨테이너 종료
+    }
 
     @Test
     void createNewStudy() {
@@ -49,7 +67,7 @@ class StudyServiceTest {
         studyService.createNewStudy(1L, study);
 
         // Then
-        assertEquals(member, study.getOwnerId());
+        assertEquals(1L, study.getOwnerId());
         then(memberService).should(times(1)).notify(study);
         then(memberService).shouldHaveNoMoreInteractions();
     }
