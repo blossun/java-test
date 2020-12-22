@@ -7,6 +7,7 @@ import dev.solar.mythejavatest.study.StudyRepository;
 import dev.solar.mythejavatest.study.StudyService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -36,8 +37,14 @@ class StudyServiceTest {
         studyService.createNewStudy(1L, study);
         assertEquals(member, study.getOwner());
 
+        // 호출 횟수 검증
         verify(memberService, times(1)).notify(study);
         verify(memberService, never()).validate(any()); //어떠한 매개변수로도 validate()가 호출되지 않았는지
+
+        // 호출 순서 검증
+        InOrder inOrder = inOrder(memberService);
+        inOrder.verify(memberService).notify(study);
+        inOrder.verify(memberService).notify(member);
     }
 
 }
