@@ -7,14 +7,13 @@ import dev.solar.mythejavatest.study.StudyRepository;
 import dev.solar.mythejavatest.study.StudyService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +38,7 @@ class StudyServiceTest {
 
         // 특정 시점 이후에 아무 일도 벌어지지 않았는지 검증
         verify(memberService, times(1)).notify(study);
-        verifyNoMoreInteractions(memberService); //memberService에서 notify(study)이후 notify(member)하고 있으므로 깨지는 테스트이다.
+        verifyNoMoreInteractions(memberService);
     }
 
 }
