@@ -6,24 +6,86 @@ import dev.solar.mythejavatest.member.MemberService;
 import dev.solar.mythejavatest.study.StudyRepository;
 import dev.solar.mythejavatest.study.StudyService;
 import dev.solar.mythejavatest.study.StudyStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.verification.VerificationMode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
+@Testcontainers
+@Slf4j
+@ContextConfiguration(initializers = StudyServiceTest.ContainerPropertyInitializer.class)
 class StudyServiceTest {
-    @Mock MemberService memberService;
-    @Mock StudyRepository studyRepository;
+    @Mock
+    MemberService memberService;
+
+    @Autowired
+    StudyRepository studyRepository;
+
+    @Autowired
+    Environment environment;
+
+    @Value("${container.port}") int port;
+
+    @Container
+    static GenericContainer postgreSQLContainer = new GenericContainer("postgres")
+            .withEnv("POSTGRES_DB", "studytest")
+            .withExposedPorts(5432).waitingFor(new WaitStrategy() {
+                @Override
+                public void waitUntilReady(WaitStrategyTarget waitStrategyTarget) {
+
+                }
+
+                @Override
+                public WaitStrategy withStartupTimeout(Duration startupTimeout) {
+                    return null;
+                }
+            });
+
+    @BeforeAll
+    static void beforeAll() {
+        Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(log);
+        postgreSQLContainer.followOutput(logConsumer);
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        System.out.println("=================================");
+        System.out.println(postgreSQLContainer.getMappedPort(5432));
+        System.out.println(environment.getProperty("container.port"));
+        System.out.println(port);
+        System.out.printf(postgreSQLContainer.getLogs());
+        studyRepository.deleteAll();
+    }
 
     @Test
     void createNewStudy() {
@@ -38,13 +100,12 @@ class StudyServiceTest {
         Study study = new Study(10, "테스트");
 
         given(memberService.findById(1L)).willReturn(Optional.of(member));
-        given(studyRepository.save(study)).willReturn(study);
 
         // When
         studyService.createNewStudy(1L, study);
 
         // Then
-        assertEquals(member, study.getOwner());
+        assertEquals(1L, study.getOwnerId());
         then(memberService).should(times(1)).notify(study);
         then(memberService).shouldHaveNoMoreInteractions();
     }
@@ -56,8 +117,6 @@ class StudyServiceTest {
         StudyService studyService = new StudyService(memberService, studyRepository);
         Study study = new Study(10, "더 자바, 테스트");
         assertNull(study.getOpenedDateTime());
-        // TODO studyRepository Mock 객체의 save 메소드를호출 시 study를 리턴하도록 만들기.
-        given(studyRepository.save(study)).willReturn(study);
 
         // When
         studyService.openStudy(study);
@@ -69,5 +128,15 @@ class StudyServiceTest {
         assertNotNull(study.getOpenedDateTime());
         // TODO memberService의 notify(study)가 호출 됐는지 확인.
         then(memberService).should(times(1)).notify(study);
+    }
+
+    static class ContainerPropertyInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+        @Override
+        public void initialize(ConfigurableApplicationContext context) {
+            // postgreSQLContainer.getMappedPort(5432)에 매핑된 포트 정보를 container.port 키값의 value로 저장
+            TestPropertyValues.of("container.port=" + postgreSQLContainer.getMappedPort(5432))
+                    .applyTo(context.getEnvironment()); //context.getEnvironment()에 등록
+        }
     }
 }
