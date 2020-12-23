@@ -6,17 +6,25 @@ import dev.solar.mythejavatest.member.MemberService;
 import dev.solar.mythejavatest.study.StudyRepository;
 import dev.solar.mythejavatest.study.StudyService;
 import dev.solar.mythejavatest.study.StudyStatus;
-import org.junit.jupiter.api.*;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.WaitStrategy;
+import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,6 +36,7 @@ import static org.mockito.Mockito.times;
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 @Testcontainers
+@Slf4j
 class StudyServiceTest {
     @Mock
     MemberService memberService;
@@ -36,11 +45,32 @@ class StudyServiceTest {
     StudyRepository studyRepository;
 
     @Container
-    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer()
-            .withDatabaseName("studytest");
+    static GenericContainer postgreSQLContainer = new GenericContainer("postgres")
+            .withEnv("POSTGRES_DB", "studytest")
+            .withExposedPorts(5432, 7777).waitingFor(new WaitStrategy() {
+                @Override
+                public void waitUntilReady(WaitStrategyTarget waitStrategyTarget) {
+
+                }
+
+                @Override
+                public WaitStrategy withStartupTimeout(Duration startupTimeout) {
+                    return null;
+                }
+            });
+
+    @BeforeAll
+    static void beforeAll() {
+        Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(log);
+        postgreSQLContainer.followOutput(logConsumer);
+    }
 
     @BeforeEach
     void beforeEach() {
+        System.out.println("=================================");
+        System.out.println(postgreSQLContainer.getMappedPort(5432));
+        System.out.println(postgreSQLContainer.getMappedPort(7777));
+        System.out.printf(postgreSQLContainer.getLogs());
         studyRepository.deleteAll();
     }
 
